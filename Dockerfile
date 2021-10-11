@@ -1,8 +1,8 @@
 FROM node:14.17.3-alpine AS builder
 WORKDIR /app
-COPY package*.json .
+COPY package*.json ./
 RUN yarn
-COPY . .
+COPY . ./
 RUN yarn build && yarn --production
 
 FROM node:14.17.3-alpine
