@@ -1,0 +1,25 @@
+image: node:14.17.3-alpine
+
+variables:
+  CI_DOCKER_IMAGE_NAME: $CI_REGISTRY/$CI_PROJECT_ROOT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA
+
+stages:
+  - build and push docker image
+
+build-and-push-image-to-docker-registry:
+  image: docker:stable
+  services:
+    - name: docker:18.09.7-dind
+  stage: build and push docker image
+  before_script:
+    - docker info
+    - echo "$CI_BUILD_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - echo "Build docker image"
+    - docker build -t "$CI_DOCKER_IMAGE_NAME" .
+    - echo "Push docker image $CI_DOCKER_IMAGE_NAME"
+    - docker push "$CI_DOCKER_IMAGE_NAME"
+  when: on_success
+  only:
+    refs:
+      - main
