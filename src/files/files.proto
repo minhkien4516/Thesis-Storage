@@ -3,10 +3,10 @@ syntax = "proto3";
 package files;
 
 service FilesService {
-  rpc GetAllForOwner (FilesByOwnerId) returns (Files);
+  rpc GetAllForOwner (GetAllForOwnerRequest) returns (GetAllForOwnerResponse) {}
 }
 
-message FilesByOwnerId {
+message GetAllForOwnerRequest {
   string ownerId = 1;
 }
 
@@ -16,6 +16,6 @@ message File {
   string url = 3;
 }
 
-message Files {
-  repeated File = 1;
+message GetAllForOwnerResponse {
+  repeated File files = 1;
 }

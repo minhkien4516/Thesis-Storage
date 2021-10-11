@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { from, mergeMap, of } from 'rxjs';
+import { from, map, mergeMap, of, toArray } from 'rxjs';
 import { File } from 'src/files/entities/file.entity';
 import { v4 as uuidV4 } from 'uuid';
 import { filesRepositoryProvideToken } from '../constants';
@@ -21,6 +21,13 @@ export class FilesService {
   }
 
   getAllForOwner(ownerId: string) {
-    return from(this._filesRepository.findAll({ where: { ownerId } }));
+    return from(this._filesRepository.findAll({ where: { ownerId } }))
+      .pipe(mergeMap((files) => from(files)))
+      .pipe(
+        mergeMap((file) =>
+          of({ id: file.id, url: file.url, ownerId: file.ownerId }),
+        ),
+        toArray(),
+      );
   }
 }
