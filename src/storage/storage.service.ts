@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
+import { from, map, mergeMap, toArray } from 'rxjs';
 
 @Injectable()
 export class StorageService {
@@ -12,15 +13,25 @@ export class StorageService {
     this.s3 = new S3();
   }
 
-  async upload(dataBuffer: Buffer, filename: string) {
-    const result = await this.s3
-      .upload({
-        Bucket: this._bucket,
-        Body: dataBuffer,
-        Key: `${filename}-${new Date()}`,
-      })
-      .promise();
+  upload(dataBuffer: Buffer, filename: string) {
+    return from(
+      this.s3
+        .upload({
+          Bucket: this._bucket,
+          Body: dataBuffer,
+          Key: `${filename}-${new Date()}`,
+        })
+        .promise(),
+    ).pipe(map((result) => result.Location));
+  }
 
-    return result.Location;
+  uploadMany(images: Array<{ filename: string; buffer: string }>) {
+    return from(images).pipe(
+      mergeMap(
+        ({ buffer, filename }) => this.upload(Buffer.from(buffer), filename),
+        images.length,
+      ),
+      toArray(),
+    );
   }
 }

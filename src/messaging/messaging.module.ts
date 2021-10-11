@@ -1,25 +1,26 @@
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FilesModule } from 'src/files/files.module';
-import { FilesService } from 'src/files/files.service';
 import { StorageModule } from 'src/storage/storage.module';
-import { StorageService } from 'src/storage/storage.service';
+import messagingConfig from './messaging.config';
 import { MessagingService } from './messaging.service';
 
 @Module({
   imports: [
     FilesModule,
-    RabbitMQModule.forRoot(RabbitMQModule, {
-      exchanges: [
-        {
-          name: 'storage',
-          type: 'topic',
-        },
-      ],
-      uri: 'amqps://xcmctebu:JL4f78Nnv8ViS9tCz6jOPRgOjYwYI2up@cattle.rmq2.cloudamqp.com/xcmctebu',
-    }),
     MessagingModule,
     StorageModule,
+    RabbitMQModule.forRootAsync(RabbitMQModule, {
+      imports: [ConfigModule.forFeature(messagingConfig)],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const uri = configService.get<string>('rabbitmq.uri');
+        if (!uri) throw new Error('rabbitmq uri is null or empty.');
+
+        return { exchanges: [{ name: 'storage', type: 'topic' }], uri };
+      },
+    }),
   ],
   providers: [MessagingService],
   exports: [MessagingService],

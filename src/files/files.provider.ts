@@ -1,8 +1,9 @@
-import { File } from '../entities/file.entity';
+import { filesRepositoryProvideToken } from '../constants';
+import { File } from './entities/file.entity';
 
 export const filesProvider = [
   {
-    provide: 'FILE_REPOSITORY',
+    provide: filesRepositoryProvideToken,
     useValue: File,
   },
 ];

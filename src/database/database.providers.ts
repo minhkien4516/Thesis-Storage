@@ -1,22 +1,27 @@
+import { ConfigService } from '@nestjs/config';
+import { from } from 'rxjs';
 import { Sequelize } from 'sequelize-typescript';
-import { File } from 'src/entities/file.entity';
+import { File } from 'src/files/entities/file.entity';
+import { databaseProvideToken } from '../constants';
 
 export const databaseProviders = [
   {
-    provide: 'SEQUELIZE_DEVELOPMENT',
-    useFactory: async () => {
+    provide: databaseProvideToken,
+    inject: [ConfigService],
+    useFactory: (configService: ConfigService) => {
       const sequelize = new Sequelize({
         dialect: 'mssql',
-        host: process.env.DB_HOST,
-        port: Number(process.env.DB_PORT),
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
+        host: configService.get('database.host'),
+        port: configService.get<number>('database.port'),
+        username: configService.get('database.user'),
+        password: configService.get('database.password'),
+        database: configService.get('database.name'),
       });
+
       sequelize.authenticate();
       sequelize.addModels([File]);
-      await sequelize.sync();
-      return sequelize;
+
+      return from(sequelize.sync());
     },
   },
 ];

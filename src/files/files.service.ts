@@ -1,19 +1,26 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { File } from 'src/entities/file.entity';
+import { from, mergeMap, of } from 'rxjs';
+import { File } from 'src/files/entities/file.entity';
 import { v4 as uuidV4 } from 'uuid';
+import { filesRepositoryProvideToken } from '../constants';
 
 @Injectable()
 export class FilesService {
   constructor(
-    @Inject('FILE_REPOSITORY')
-    private fileRepository: typeof File,
+    @Inject(filesRepositoryProvideToken)
+    private _filesRepository: typeof File,
   ) {}
-  async saveFile(ownerId, urls) {
-    await this.fileRepository.bulkCreate<File>(
-      urls.map((url) => {
-        const id = uuidV4();
-        return { id, ownerId, url };
-      }),
+
+  saveFile(ownerId: string, urls: Array<string>) {
+    return from(urls).pipe(
+      mergeMap((url) =>
+        of(this._filesRepository.build({ id: uuidV4(), ownerId, url })),
+      ),
+      mergeMap((file) => from(file.save())),
     );
+  }
+
+  getAllForOwner(ownerId: string) {
+    return from(this._filesRepository.findAll({ where: { ownerId } }));
   }
 }

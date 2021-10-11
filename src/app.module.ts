@@ -5,9 +5,7 @@ import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: ['.env.development'],
-    }),
+    ConfigModule.forRoot({ envFilePath: ['.env.development', '.env'] }),
     FilesModule,
     MessagingModule,
   ],

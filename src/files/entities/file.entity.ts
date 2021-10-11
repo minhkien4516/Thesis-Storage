@@ -7,17 +7,16 @@ import {
   Table,
 } from 'sequelize-typescript';
 
-import { v4 as uuidV4 } from 'uuid';
 @Table
 export class File extends Model {
-  @IsUUID(4)
   @PrimaryKey
-  @Column({ defaultValue: uuidV4() })
-  id: string;
+  @IsUUID(4)
+  @Column
+  id!: string;
 
   @Column
-  ownerId: string;
+  ownerId!: string;
 
   @Column(DataType.TEXT)
-  url: string;
+  url!: string;
 }

@@ -1,30 +1,32 @@
-import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { RabbitRPC } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
-import { ConsumeMessage } from 'amqplib';
+import { mergeMap } from 'rxjs';
 import { FilesService } from '../files/files.service';
 import { StorageService } from '../storage/storage.service';
+import { FilesUploadRequestDto } from './dtos/filesUploadRequestDto';
 
 @Injectable()
 export class MessagingService {
   constructor(
-    private readonly storageService: StorageService,
-    private readonly filesService: FilesService,
+    private readonly _storageService: StorageService,
+    private readonly _filesService: FilesService,
   ) {}
 
-  @RabbitSubscribe({
+  @RabbitRPC({
     queue: 'storage',
     exchange: 'storage',
-    routingKey: 'routing-key',
-    queueOptions: {},
+    routingKey: 'storage.routing-key',
+    queueOptions: {
+      durable: false,
+      autoDelete: true,
+    },
   })
-  public async rpcHandler(msg: any, amqpMsg: ConsumeMessage) {
-    const urls = await Promise.all(
-      msg.files.map(async (file) => {
-        const buf = Buffer.from(file.buffer);
-        return await this.storageService.upload(buf, file.originalName);
-      }),
-    );
-
-    await this.filesService.saveFile(msg.ownerId, urls);
+  public uploadRequestHandler(message: FilesUploadRequestDto) {
+    this._storageService
+      .uploadMany(message.files)
+      .pipe(
+        mergeMap((urls) => this._filesService.saveFile(message.ownerId, urls)),
+      )
+      .subscribe();
   }
 }
