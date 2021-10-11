@@ -20,7 +20,7 @@ async function bootstrap() {
     options: {
       package: 'files',
       protoPath: join(__dirname, 'files/files.proto'),
-      url: 'localhost:3005',
+      url: configService.get<string>('GRPC_CONNECTION_URL'),
     },
   });
 
