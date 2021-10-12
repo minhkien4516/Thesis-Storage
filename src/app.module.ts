@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module';
 import { FilesModule } from './files/files.module';
 import { MessagingModule } from './messaging/messaging.module';
 
@@ -8,8 +9,7 @@ import { MessagingModule } from './messaging/messaging.module';
     ConfigModule.forRoot({ envFilePath: ['.env.development', '.env'] }),
     FilesModule,
     MessagingModule,
+    DatabaseModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
