@@ -1,4 +1,4 @@
-import { RabbitRPC, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { RabbitRPC } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
 import { mergeMap } from 'rxjs';
 import { FilesService } from '../files/files.service';
@@ -12,7 +12,7 @@ export class MessagingService {
     private readonly _filesService: FilesService,
   ) {}
 
-  @RabbitSubscribe({
+  @RabbitRPC({
     queue: 'storage',
     exchange: 'storage',
     routingKey: 'storage.routing-key',
