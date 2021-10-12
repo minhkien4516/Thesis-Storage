@@ -21,11 +21,9 @@ export class FilesService {
   }
 
   getAllForOwner(ownerId: string) {
-    return from(this._filesRepository.findAll({ where: { ownerId } }))
-      .pipe(mergeMap((files) => from(files)))
-      .pipe(
-        mergeMap((file) => of({ ...file })),
-        toArray(),
-      );
+    return from(this._filesRepository.findAll({ where: { ownerId } })).pipe(
+      mergeMap((files) => from(files)),
+      toArray(),
+    );
   }
 }
