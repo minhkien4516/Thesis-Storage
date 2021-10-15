@@ -1,4 +1,4 @@
 export interface FilesUploadRequestDto {
   ownerId: string;
-  files: Array<{ filename: string; buffer: string }>;
+  files: Array<{ filename: string; buffer: string; mimetype: string }>;
 }
