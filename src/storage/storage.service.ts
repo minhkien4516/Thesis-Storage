@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import { from, map, mergeMap, toArray } from 'rxjs';
+import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
 export class StorageService {
@@ -13,13 +14,13 @@ export class StorageService {
     this.s3 = new S3();
   }
 
-  upload(dataBuffer: Buffer, filename: string, mimetype: string) {
+  upload(buffer: Buffer, filename: string, mimetype: string) {
     return from(
       this.s3
         .upload({
           Bucket: this._bucket,
-          Body: dataBuffer,
-          Key: `${filename}-${new Date()}`,
+          Body: buffer,
+          Key: uuidV4(),
           ACL: 'public-read',
           ContentDisposition: 'inline',
           ContentType: mimetype,
@@ -29,7 +30,7 @@ export class StorageService {
   }
 
   uploadMany(
-    images: Array<{ filename: string; buffer: string; mimetype: string }>,
+    images: Array<{ filename: string; buffer: Buffer; mimetype: string }>,
   ) {
     return from(images).pipe(
       mergeMap(
