@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { from } from 'rxjs';
 import { Sequelize } from 'sequelize-typescript';
-import { File } from 'src/files/entities/file.entity';
+import { File } from '../files/entities/file.entity';
 import { databaseProvideToken } from '../constants';
 
 export const databaseProviders = [
