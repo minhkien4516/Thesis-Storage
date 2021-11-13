@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import { from, map, mergeMap, toArray } from 'rxjs';
-import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
-export class StorageService {
+export class S3Service {
   private readonly _bucket: string;
   private readonly s3: S3;
 
@@ -20,7 +19,7 @@ export class StorageService {
         .upload({
           Bucket: this._bucket,
           Body: buffer,
-          Key: uuidV4(),
+          Key: `${filename}-${new Date().toUTCString()}`,
           ACL: 'public-read',
           ContentDisposition: 'inline',
           ContentType: mimetype,

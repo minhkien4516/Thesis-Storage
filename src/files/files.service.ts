@@ -11,12 +11,9 @@ export class FilesService {
     private _filesRepository: typeof File,
   ) {}
 
-  saveFile(ownerId: string, urls: Array<string>) {
+  saveFiles(ownerId: string, urls: Array<string>) {
     return from(urls).pipe(
-      mergeMap((url) =>
-        of(this._filesRepository.build({ id: uuidV4(), ownerId, url })),
-      ),
-      mergeMap((file) => from(file.save())),
+      mergeMap((url) => this.saveFile(ownerId, url).pipe(toArray())),
     );
   }
 
@@ -24,6 +21,12 @@ export class FilesService {
     return from(this._filesRepository.findAll({ where: { ownerId } })).pipe(
       mergeMap((files) => from(files)),
       toArray(),
+    );
+  }
+
+  private saveFile(ownerId: string, url: string) {
+    return of(this._filesRepository.build({ id: uuidV4(), ownerId, url })).pipe(
+      mergeMap((file) => from(file.save())),
     );
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import s3Config from './storage.config';
-import { StorageService } from './storage.service';
+import s3Config from './s3.config';
+import { S3Service } from './s3.service';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { StorageService } from './storage.service';
     }),
     ConfigModule.forFeature(s3Config),
   ],
-  providers: [StorageService],
-  exports: [StorageService],
+  providers: [S3Service],
+  exports: [S3Service],
 })
-export class StorageModule {}
+export class S3Module {}

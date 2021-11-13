@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
@@ -26,5 +27,8 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(configService.get<number>('PORT') || 3005);
+
+  const logger = new Logger('Application');
+  logger.log(`Storage service is running on ${await app.getUrl()}`);
 }
 bootstrap();

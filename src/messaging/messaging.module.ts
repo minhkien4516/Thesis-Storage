@@ -2,7 +2,7 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FilesModule } from 'src/files/files.module';
-import { StorageModule } from 'src/storage/storage.module';
+import { S3Module } from '../s3/s3.module';
 import messagingConfig from './messaging.config';
 import { MessagingService } from './messaging.service';
 
@@ -10,7 +10,7 @@ import { MessagingService } from './messaging.service';
   imports: [
     FilesModule,
     MessagingModule,
-    StorageModule,
+    S3Module,
     RabbitMQModule.forRootAsync(RabbitMQModule, {
       imports: [ConfigModule.forFeature(messagingConfig)],
       inject: [ConfigService],
